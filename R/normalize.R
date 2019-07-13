@@ -1,5 +1,5 @@
 
-normalize_from_mri <- function(signal, arrival_frame, echotime=0.01) {
+normalize_from_mri <- function(signal, arrival_frame, echotime) {
   signal <- seperate_tissue_signal(signal, arrival_frame)
   return(-1/echotime * log(signal$signal/signal$baseline))
 }

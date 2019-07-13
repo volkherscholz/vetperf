@@ -7,5 +7,5 @@ get_perfusion_params <- function(flow_scaled_residue, delta_t, density) {
   # calculate cbv
   cbv = 1/density * delta_t * sum(flow_scaled_residue)
   #
-  return(list(mtt = mtt, cbf = cbf, cbv = cbv))
+  return(list(MTT = mtt, CBF = cbf, CBV = cbv))
 }
