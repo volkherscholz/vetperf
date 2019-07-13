@@ -6,6 +6,9 @@
 .ipynb_*/*
 *.ipynb
 
+# old stuff
+oldstuff/*
+
 # rstudio
 .rstudio/*
 
