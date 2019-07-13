@@ -1,0 +1,44 @@
+---
+title: "Veterinary Perfusion Analysis"
+author: "Antje Hartmann, Volkher Scholz, Ines Lautenschlaeger"
+date: "06/07/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(ggplot2)
+library(data.table)
+# devtools::use_rstudio(".")
+# library(roxygen2)
+# install("veterinary-perfusion-analysis")
+
+data = fread('../data/all_animals.csv', stringsAsFactors = TRUE)
+```
+
+
+```{r}
+data[(data$animal == 1 & data$side == 'li'), ]
+```
+
+
+
+```{r}
+aif = fread('../data/aifdata.csv')
+roi = fread('../data/roidata.csv')
+```
+
+```{r}
+aif_exp = as.matrix(aif[1,5:44])
+roi_exp = as.matrix(roi[5,5:44])
+
+vetperf(aifexp, roiexp, arrival_frame = 9, delta_t = 1.6, density = 1.)
+```
+
+```{r}
+library(glmnet)
+
+get_flow_scaled_residue(aif_exp, roi_exp, arrival_frame = 9, delta_t = 1.04, alpha = .1)
+```
+
+

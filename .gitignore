@@ -2,6 +2,13 @@
 .Rhistory
 .Rapp.history
 
+# jupyter
+.ipynb_*/*
+*.ipynb
+
+# rstudio
+.rstudio/*
+
 # Session Data files
 .RData
 
