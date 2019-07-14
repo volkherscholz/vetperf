@@ -16,10 +16,16 @@ install.packages("vetperf")
 
 ## Example
 
-This is a basic example which shows you how to solve a common problem:
+Load your data from csv (check out the great data.table package!) and run vetperf.data on
+your data. You will get a table holding the perfusion parameters.
 
 ``` r
+library(data.table)
 library(vetperf)
-## basic example code
+animals <- fread('path/to/your/data.csv', stringsAsFactors = TRUE)
+perfdata = vetperf.data(animals, arrival_frame = 9, delta_t = 1.6, echo_time = 0.03, baseroi = "cs")
 ```
+## More information
 
+Can be found in the package vignette. For an explanation on the format of the data frame, take a 
+look at the examples or at the code documentation.
