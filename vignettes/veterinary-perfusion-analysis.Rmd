@@ -1,0 +1,105 @@
+---
+title: "veterinary-perfusion-analysis"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{veterinary-perfusion-analysis}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+# Setup
+
+First, let us load all the packages we will need.
+
+```{r setup}
+library(vetperf)
+library(ggplot2)
+library(data.table)
+library(lme4)
+```
+
+# Extract Perfusion parameters
+
+Quickly extract perfusion parameters from measurements.
+
+## Data Import
+
+First let us load the data. The vetperf package provides a dataset with measurements from 20 dogs, but you
+can also easily load your own by calling the "fread" function from the "data.table" package.
+
+```{r}
+# Alternatively load your own data
+# animals = fread('path/to/your/data.csv', stringsAsFactors = TRUE)
+head(animals, 10)
+```
+
+## Compute parameters
+
+Call the main function to compute perfusion parameters. Here, we let internally use cross-validation
+to find the best hyperparameters and return normalized perfusion parameters. We use the "cs" (corresponding for the Centrum Semiovale) ROI for the normalization. In addition, we remove all measurements for which
+no perfusion parameters could be computed (i.e. if the algorithm does not converge).
+
+```{r}
+perfdata = vetperf.data(animals, arrival_frame = 9, delta_t = 1.6, echo_time = 0.03, baseroi = "cs")
+perfdata = na.omit(perfdata)
+```
+
+# Analyze disease influence
+
+Let us briefly describe how we can analyze the perfusion parameters. First, we need to add the information
+which dogs were healthy or not (not included in the dataset for simplicity).
+
+## Format data
+
+The first 8 dogs were healthy, the last 12 were diseased.
+
+```{r}
+perfdata[animal %in% c(1:8), state := "healty"]
+perfdata[animal %in% c(9:20), state := "diseased"]
+perfdata$state = as.factor(perfdata$state)
+```
+
+## Plot densities
+
+Quickly plot the densities of parameters to visualy identify differences between healthy and diseased dogs.
+The most obvious difference is seen for the Hippocampus.
+
+```{r}
+ggplot(perfdata) + aes(x = MTT, color = state) + geom_density() + facet_wrap(~roi)
+ggplot(perfdata) + aes(x = CBF, color = state) + geom_density() + xlim(0,5.) + facet_wrap(~roi)
+ggplot(perfdata) + aes(x = CBV, color = state) + geom_density() + xlim(0,5.) + facet_wrap(~roi)
+```
+
+## Check for significance
+
+Fit Linear Mixed Models to assess the significance of the factor "state". We start with the MTT parameter.
+First, fit a model not including the factor and then one including the factor. Finally, we compare
+both models using a $\chi_2$ test. The result clearly indicates that the factor "state" is significant.
+
+```{r}
+model.mtt.0 = lmer(MTT ~ roi + (1|animal), data=perfdata)
+model.mtt.1 = lmer(MTT ~ roi*state + (1|animal), data=perfdata)
+anova(model.mtt.0, model.mtt.1)
+```
+
+Now we look at the CBF parameter. Considering the distribution plots, a Gamma distribution seems to be
+a much better fit than a normal distribution. The $\chi_2$ test again clearly indicates that the factor "state" is significant.
+
+```{r}
+model.cbf.0 = glmer(CBF ~ roi + (1|animal), data=perfdata, family = Gamma(link = "log"))
+model.cbf.1 = glmer(CBF ~ roi*state + (1|animal), data=perfdata, family = Gamma(link = "log"))
+anova(model.cbf.0, model.cbf.1)
+```
+
+# Conclusion
+
+We provide a simple package to compute perfusion parameters obtained from measurements which can be
+taken using standard imaging software.
+

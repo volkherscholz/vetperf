@@ -1,9 +1,24 @@
-Package: veterinary-perfusion-analysis
+Package: vetperf
 Type: Package
-Title: What the package does (short line)
+Title: Extract perfusion parameters from veterinary studies
 Version: 0.1
 Date: 2019-07-06
-Author: Volkher Scholz
-Maintainer: Volkher Scholz <volkher.scholz@gmail.com>
-Description: More about what it does (maybe more than one line)
-License: What license is it under?
+Authors@R:
+    person("Volkher", "Scholz", email = "volkher.scholz@gmail.com", role = c("aut", "cre"))
+Description: We provide functions to extract standard perfusion parameters from data obtained
+    using standard free imaging software like Horos. Deconvolution is based on l1-l2 weighted regression.
+License: MIT + file LICENSE
+Depends:
+    R (>= 3.0)
+Imports: 
+    glmnet,
+    data.table,
+    stats
+Suggests: 
+    ggplot2,
+    knitr,
+    lme4,
+    rmarkdown
+RoxygenNote: 6.1.1.9000
+LazyData: true
+VignetteBuilder: knitr

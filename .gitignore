@@ -9,6 +9,9 @@
 # old stuff
 oldstuff/*
 
+# zip files for data
+*.zip
+
 # rstudio
 .rstudio/*
 
@@ -44,3 +47,5 @@ vignettes/*.pdf
 
 # Shiny token, see https://shiny.rstudio.com/articles/shinyapps.html
 rsconnect/
+.Rproj.user
+inst/doc
