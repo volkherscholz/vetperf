@@ -14,6 +14,7 @@
 #' @param delta_t Float, the time between two consecutive images
 #' @param echo_time Float, MRI echo time of the sequence
 #' @param density Float, density of the brain (optional)
+#' @param alpha Float, elastic-net hyperparameter (l1 vs l2 weight), optional, default 0.1
 #' @param lambda Float, l1-l2 glmnet hyperparameter. Will be determined via cross-validation
 #'   if not provided (recommend)
 #' @param iterations Integer, the number of iterations used for cross-validation (optional, default 10)
@@ -21,7 +22,7 @@
 #' @return List with MTT, CBF, CBV parameters
 #' @export 
 #' 
-vetperf.num <- function(aifnum, roinum, arrival_frame, delta_t, echo_time, density = 1.04, lambda = NULL, iterations = 10) {
+vetperf.num <- function(aifnum, roinum, arrival_frame, delta_t, echo_time, density = 1.04, alpha = 0.1, lambda = NULL, iterations = 10) {
   # deconvolution
   f_s_res_fit <- perfresidue(
     aif = aifnum,
@@ -29,6 +30,7 @@ vetperf.num <- function(aifnum, roinum, arrival_frame, delta_t, echo_time, densi
     arrival_frame = arrival_frame,
     delta_t = delta_t,
     echo_time = echo_time,
+    alpha = alpha,
     lambda = lambda,
     iterations = iterations)
   f_s_res <- f_s_res_fit$residue
@@ -67,6 +69,7 @@ vetperf.num <- function(aifnum, roinum, arrival_frame, delta_t, echo_time, densi
 #' @param baseroi String, the name of the white matter roi which should be used for normalization 
 #'   (if normalized values should be returned)
 #' @param density Float, density of the brain (optional)
+#' @param alpha Float, elastic-net hyperparameter (l1 vs l2 weight), optional, default 0.1
 #' @param lambda Float, l1-l2 glmnet hyperparameter. Will be determined via cross-validation
 #'   if not provided (recommend)
 #' @param iterations Integer, the number of iterations used for cross-validation (optional, default 10)
@@ -89,6 +92,7 @@ vetperf.data <- function(
   valcol = "value",
   baseroi = NULL,
   density = 1.04,
+  alpha = 0.1,
   lambda = NULL,
   iterations = 10) {
   # rename columns to defaults
@@ -109,6 +113,7 @@ vetperf.data <- function(
         delta_t = delta_t,
         echo_time = echo_time,
         density = density,
+        alpha = alpha,
         lambda = lambda,
         iterations = iterations),
       by = roi]

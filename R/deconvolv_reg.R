@@ -13,7 +13,7 @@
 #' @param arrival_frame Integer, the frame number at which the bolus arrived
 #' @param delta_t Float, the time between two consecutive images
 #' @param echo_time Float, MRI echo time of the sequence
-#' @param alpha Float, l1 hyperparameter (l1 vs l2 weight), optional, default 0.1
+#' @param alpha Float, elastic-net hyperparameter (l1 vs l2 weight), optional, default 0.1
 #' @param lambda Float, l1-l2 glmnet hyperparameter. Will be determined via cross-validation
 #'   if not provided (recommend)
 #' @param iterations Integer, the number of iterations used for cross-validation (optional, default 10)
@@ -45,15 +45,12 @@ get_reg_elements <- function(aif_norm, roi_norm, delta_t) {
 
 
 get_min_lambda <- function(A, signal, iterations) {
-  # from
-  # https://stats.stackexchange.com/questions/97777/variablity-in-cv-glmnet-results
-  # do cross validation to get best lambda and average over many runs
-  MSEs <- NULL
+  # average over the best lambda from runs to get a more stable result
+  lambdas <- NULL
   for (i in 1:iterations){
     cv <- glmnet::cv.glmnet(A, signal, alpha=0.1, intercept=FALSE, lower=0., nfolds = 3)  
-    MSEs <- cbind(MSEs, cv$cvm)
+    lambdas <- c(lambdas, cv$lambda.1se)
   }
-  rownames(MSEs) <- cv$lambda
-  lambda.min <- as.numeric(names(which.min(rowMeans(MSEs))))
-  return(lambda.min)
+  return(mean(lambdas))
 }
+
